@@ -1,12 +1,12 @@
 import React from "react";
 
-const contacto =()=>{
+const Contacto =()=>{
     return(
 
         <div>
-            <h1>HOME</h1>
+            <h1>Contacto</h1>
         </div>
     )
 
 }
-export default contacto
+export default Contacto
