@@ -6,7 +6,7 @@ const Home =()=>{
 
         <div>
             <Carousel></Carousel>
-            <h1>PANTALLA PRINCIPAL</h1>
+            <h1></h1>
         </div>
     )
 
