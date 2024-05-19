@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import "../App.css";  
 
 const Formulario = () => {
     const [formData, setFormData] = useState({
@@ -6,114 +7,139 @@ const Formulario = () => {
         email: '',
         password: '',
         confirmPassword: '',
-        address: '',
-        phoneNumbers: [''],
+        address: ''
     });
 
-    const [errors, setErrors] = useState({});
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    }
 
-    const handleChange = (e, index) => {
-        if (e.target.name === 'phoneNumbers') {
-            const phoneNumbers = [...formData.phoneNumbers];
-            phoneNumbers[index] = e.target.value;
-            setFormData({ ...formData, phoneNumbers });
-        } else {
-            setFormData({ ...formData, [e.target.name]: e.target.value });
-        }
-    };
-
-    const addPhoneNumber = () => {
-        setFormData({ ...formData, phoneNumbers: [...formData.phoneNumbers, ''] });
-    };
-
-    const validate = () => {
-        const newErrors = {};
-        if (!formData.name) newErrors.name = 'Name is required';
-        if (!formData.email) newErrors.email = 'Email is required';
-        if (!formData.password) newErrors.password = 'Password is required';
-        if (formData.password !== formData.confirmPassword)
-            newErrors.confirmPassword = 'Passwords do not match';
-        return newErrors;
-    };
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const validationErrors = validate();
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-        } else {
-            // Submit form data
-            console.log('Form submitted', formData);
+        if (formData.password !== formData.confirmPassword) {
+            alert('Las contraseñas no coinciden');
+            return;
+        }
+        try {
+            const response = await fetch('https://api.escuelajs.co/api/v1/users/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    password: formData.password,
+                    avatar: 'https://picsum.photos/800'
+                })
+            });
+    
+            if (!response.ok) {
+                throw new Error('Error al enviar el formulario');
+            }
+    
+            const responseData = await response.json();
+            const userId = responseData.id;
+            const role = responseData.role;
+    
+          
+            setFormData({
+                name: '',
+                email: '',
+                password: '',
+                confirmPassword: '',
+                address: ''
+            });
+    
+            
+            alert(`Cliente registrado con éxito. El número de cliente es ${userId}, y su rol es ${role}`);
+        } catch (error) {
+            alert('Ocurrió un error al enviar el formulario. Por favor, intenta nuevamente.');
+            console.error(error);
         }
     };
-
     return (
-        <form className="advanced-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-                <label>Name</label>
-                <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                />
-                {errors.name && <p className="error">{errors.name}</p>}
+        <div className="form_container_contact">
+            <div className="form_header">
+                <h1 className="form_title">Registrar usuario</h1>
             </div>
-            <div className="form-group">
-                <label>Email</label>
-                <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                />
-                {errors.email && <p className="error">{errors.email}</p>}
+            <div className="form_body">
+                <form onSubmit={handleSubmit}>
+                    <div className="form">
+                        <label className="form_label">NOMBRE:</label>
+                        <div className="form_input-ico">
+                            <input
+                                type="text"
+                                className="form_input"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div className="form">
+                        <label className="form_label">CORREO:</label>
+                        <div className="form_input-ico">
+                            <input
+                                type="email"
+                                className="form_input"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div className="form">
+                        <label className="form_label">CONTRASEÑA:</label>
+                        <div className="form_input-ico">
+                            <input
+                                type="password"
+                                className="form_input"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div className="form">
+                        <label className="form_label">CONFIRMAR CONTRASEÑA:</label>
+                        <div className="form_input-ico">
+                            <input
+                                type="password"
+                                className="form_input"
+                                name="confirmPassword"
+                                value={formData.confirmPassword}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div className="form">
+                        <label className="form_label">DIRECCION:</label>
+                        <div className="form_input-ico">
+                            <input
+                                type="text"
+                                className="form_input"
+                                name="address"
+                                value={formData.address}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                    </div>
+                    <div className="form">
+                        <button type="submit">ENVIAR</button>
+                    </div>
+                </form>
             </div>
-            <div className="form-group">
-                <label>Password</label>
-                <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                />
-                {errors.password && <p className="error">{errors.password}</p>}
-            </div>
-            <div className="form-group">
-                <label>Confirm Password</label>
-                <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                />
-                {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
-            </div>
-            <div className="form-group">
-                <label>Address</label>
-                <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                />
-            </div>
-            <div className="form-group">
-                <label>Phone Numbers</label>
-                {formData.phoneNumbers.map((phone, index) => (
-                    <input
-                        key={index}
-                        type="text"
-                        name="phoneNumbers"
-                        value={phone}
-                        onChange={(e) => handleChange(e, index)}
-                    />
-                ))}
-                <button type="button" onClick={addPhoneNumber}>Add Phone Number</button>
-            </div>
-            <button type="submit">Submit</button>
-        </form>
+        </div>
     );
-};
+}
 
 export default Formulario;
